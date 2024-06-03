@@ -1,0 +1,27 @@
+# GPT generated
+# reviewed by author
+
+# Example list
+elements = [1, 2, 3, 4, 1, 2, 3, 5]
+
+# Forward traversal requires temporary storage
+buffer = []
+for i in range(len(elements)):
+    buffer.append(elements[i])
+    if i + 1 < len(elements) and elements[i + 1] == 3:
+        # Save all elements in buffer
+        for item in buffer:
+            save(item)
+        buffer.clear()  # Clear the buffer after saving
+    elif i + 2 < len(elements) and elements[i + 2] == 3:
+        # Save all elements in buffer
+        for item in buffer:
+            save(item)
+        buffer.clear()  # Clear the buffer after saving
+
+# Reverse traversal can decide immediately
+for i in range(len(elements) - 1, -1, -1):
+    if i + 1 < len(elements) and elements[i + 1] == 3:
+        save(elements[i])
+    elif i + 2 < len(elements) and elements[i + 2] == 3:
+        save(elements[i])
