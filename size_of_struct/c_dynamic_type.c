@@ -1,5 +1,12 @@
 // gcc c_dynamic_type.c -o c_dynamic_type
 // ./c_dynamic_type
+/**
+ * output
+ * as type_A, a->a is 1
+ * as type_B, a->a is 67305985
+ * as type_B, a2->a is 67305985
+ * as type_A, b2->a is 1
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
