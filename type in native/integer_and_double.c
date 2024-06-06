@@ -1,9 +1,12 @@
 /**
  * gcc -c integer_and_double.c -o app -O0
+ * -O0 means no optimization
 */
 
 #include <stdio.h>
 
+// function prototype declarations
+// functions are separated to clearly shows the assembly code
 int operate_integer(int a, int b);
 double operate_double(double a, double b);
 double operate_as_double(int a, int b);
