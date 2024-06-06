@@ -26,13 +26,17 @@ int main() {
 
 int operate_integer(int a, int b) {
     int c;
+    // a line to watch
     c = a * b;
+    // neglect the return. It's just for syntax.
     return a + b;
 }
 
 double operate_double(double a, double b) {
     double c;
+    // a line to watch
     c = a * b;
+    // neglect the return. It's just for syntax.
     return a + b;
 }
 
