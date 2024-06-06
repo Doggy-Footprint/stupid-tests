@@ -15,9 +15,11 @@ int main() {
 
     int i;
     double d;
+    double d2;
 
     i = operate_integer(3, 4);
     d = operate_double(3.0, 4.0);
+    d2 = operate_as_double(3, 4);
 
     return 0;
 }
