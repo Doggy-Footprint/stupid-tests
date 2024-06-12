@@ -5,7 +5,7 @@ print(foo())
 
 class A:
     def fooA(self) -> int:
-        return 1
+        return [1, 'a']
 
 a = A()
 
