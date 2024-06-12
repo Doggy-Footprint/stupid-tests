@@ -3,3 +3,12 @@ def foo() -> str:
 
 print(foo())
 
+class A:
+    def fooA(self) -> int:
+        return 1
+
+a = A()
+
+method = getattr(a, 'foo' + 'A')
+
+print(method())
