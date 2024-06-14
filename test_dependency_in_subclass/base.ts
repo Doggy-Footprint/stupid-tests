@@ -1,5 +1,5 @@
 // This class support add method according to order defined by MyOrder.myOrder
-export class MyOrder {
+export class TestOrder {
     static myOrder: string[] = ['e', 'q', 'w', 'm', 'x', 'g', 'i', 'y', 's', 'k', 'j', 'o', 'h', 'b', 'r', 't', 'v', 'z', 'd', 'f', 'l', 'a', 'n', 'c', 'p', 'u'];
     
     nodes: Node[];
@@ -31,8 +31,8 @@ export class MyOrder {
         const length = Math.min(a.content.length, b.content.length);
         
         for (let i = 0; i < length; i++) {
-            const a_ = MyOrder.myOrder.indexOf(a.content.charAt(i));
-            const b_ = MyOrder.myOrder.indexOf(b.content.charAt(i));
+            const a_ = TestOrder.myOrder.indexOf(a.content.charAt(i));
+            const b_ = TestOrder.myOrder.indexOf(b.content.charAt(i));
             if (a_ === b_) continue;
             if (a_ < b_) return true;
             else if (a_ > b_) return false;
