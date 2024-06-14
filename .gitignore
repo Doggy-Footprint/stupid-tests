@@ -4,3 +4,4 @@ type in native/app
 **/__pycache__/*
 **/node_modules
 **/package-lock.json
+TRIE/index.js
