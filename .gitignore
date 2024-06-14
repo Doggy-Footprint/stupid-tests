@@ -5,3 +5,4 @@ type in native/app
 **/node_modules
 **/package-lock.json
 TRIE/index.js
+test_dependency_in_subclass/index.js
