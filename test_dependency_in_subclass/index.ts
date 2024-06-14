@@ -1,1 +1,3 @@
-console.log('hi');
+import { test } from './test_base'
+
+test();
