@@ -10,6 +10,9 @@
   "author": "Doggy-Footprint",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@types/node": "^20.14.2",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
     "typescript": "^5.4.5"
   }
 }
