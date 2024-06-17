@@ -36,7 +36,10 @@ public class Main {
             return isOdd ? (double)nums1[nums1.length/2]: ((double)nums1[nums1.length/2 - 1] + (double)nums1[nums1.length/2])/2.0;
         }
 
-
+        /**
+         * [2,3] , [1,4,5,6] - case: removes 3 but 3 is included in median. below binary search doesn't work with small number of arrays
+         * no, removing partition logic is written wrong. We need to tune where to trim an element by element, until we reach wanted cutoff.
+         */
         while (end1 - start1 + end2 - start2 + 2 > 5) {
             if (nums1[end1] < nums2[start2]) {
                 // two partitions have no overlap, a partition of nums1 comes first
@@ -46,9 +49,22 @@ public class Main {
                 return this.getMedianFromOrderedPartitions(isOdd, nums2, nums1, start2, end2, start1, end1);
             }
 
+            // including cases
 
-            // fraction problem - as long as keep removing same size, the oddity remains. and median remains median.
+            // fractioned index problem - as long as keep removing same size, the oddity remains. and median remains median.
             int sizeOfPartitionToRemove = (end1 - start1 + end2 - start2 + 2) / 4;
+
+            // prove that median remain median after removing two partitions in a single array
+            if (end1 - start1 + 1 <= sizeOfPartitionToRemove) {
+                end2 = end2 - sizeOfPartitionToRemove;
+                start2 = start2 + sizeOfPartitionToRemove;
+                continue;
+            }
+            if (end2 - start2 + 1 <= sizeOfPartitionToRemove) {
+                end1 = end1 - sizeOfPartitionToRemove;
+                start1 = start1 + sizeOfPartitionToRemove;
+                continue;
+            }
 
             // core consideration: case [2], and [1,3,4,5,6] -> m+n/4 is not guarnteed to be smaller than m or n
             /**
