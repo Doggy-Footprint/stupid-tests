@@ -92,13 +92,13 @@ export class Node {
         this.materials.push(material);
 
         if (updateAncestorMetadata && this.parent)
-            this.parent.updateParentMetadataRecursively(material);
+            this.parent.updateParentMetadataUptoRoot(material);
     }
 
-    updateParentMetadataRecursively(material: NodeMaterial) {
+    updateParentMetadataUptoRoot(material: NodeMaterial) {
         var cursor: typeof this.parent = this;
         while (cursor?.metadata.updatePromisingMaterials([material])) {
-            cursor = this.parent;
+            cursor = cursor.parent;
         }
     }
 }
@@ -155,7 +155,3 @@ export class NodeMaterial {
         this.useCount = 0;
     }
 }
-
-
-const trie = new Trie();
-trie.addNode("abc", new NodeMaterial("abc"));
