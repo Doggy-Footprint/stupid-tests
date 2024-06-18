@@ -1,95 +1,83 @@
 export class Trie {
     // TODO: don't allow duplicate
-    roots: Node[];
+    roots: Map<string, Node>;
 
-    constructor(roots: Node[] = []) {
-        this.roots = roots;
+    constructor(roots?: Map<string, Node>) {
+        this.roots = roots?? new Map<string, Node>();
     }
 
-    addNode(fullstr: string, material?: NodeMaterial) {
+    addNode(fullstr: string, material: NodeMaterial) {
         const firstChar = fullstr.charAt(0);
-        let root = this.roots.find(r => r.nodeChar == firstChar);
+        let root = this.roots.get(firstChar);
         if (!root) {
-            root = new Node(firstChar);
-            this.roots.push(root);
+            root = new Node();
+            this.roots.set(firstChar, root);
         }
-        Node.addNode(root, fullstr, material);
+
+        root.addNode(fullstr, material);
     }
 
     findNode(query: string): Node | null {
         let nodeSet = this.roots;
 
         for (const char of query.slice(0, -1)) {
-            const children = nodeSet.find(n => n.nodeChar == char)?.children;
+            const children = nodeSet.get(char)?.children;
             if (!children) return null;
             nodeSet = children;
         }
 
-        return nodeSet.find(n => n.nodeChar == query.slice(-1)) ?? null;
+        return nodeSet.get(query.slice(-1)) ?? null;
     }
 }
 
-/**
- * A Node object is responsible for forming TRIE with its own character.
- * Additionally, the Node class holds NodeMetadata, NodeMaterial properties. 
- * Node class's responsibility is to call each properties method, 
- * not manipulating them directly.
- */
 export class Node {
-    nodeChar: string;
-    children: Node[]; // not-null // TODO: make children a Set object.
+    children: Map<string, Node>; // not-null // TODO: make children a Set object.
     parent: Node | null;
-    metadata: NodeMetaData;
+    metadata: NodeMetaData; // not-null
     materials: NodeMaterial[];
 
-    constructor(nodeChar: string, parent: Node | null = null, children: Node[] = []) {
-        this.nodeChar = nodeChar;
+    constructor(materials?: NodeMaterial[] | null, parent: Node | null = null) {
         this.parent = parent;
-        this.children = children;
+        this.children = new Map<string, Node>();
         // additional information such as metadata and materials set via other methods.
         this.metadata = new NodeMetaData();
-        this.materials = [];
-
-        if (parent) parent.addChild(this);
+        this.materials = materials ?? [];
     }
 
-    addChild(child: Node) {
+    addChild(key: string, child: Node) {
         // TODO: duplicate nodeChar check.
-        this.children.push(child);
+        this.children.set(key, child);
         child.parent = this;
     }
 
     /**
      * Key function - form TRIE tree, Node with material is additional feature
      * @param root 
-     * @param fullstr 
+     * @param fullstr full string includig this node's key
      * @param material 
      */
-    static addNode(root: Node, fullstr: string, material?: NodeMaterial) {
-        if (fullstr.charAt(0) !== root.nodeChar) return false;
-        let newNode = new Node(fullstr.slice(-1));
-        let cursor: Node = root;
-        for (const char of fullstr.slice(1, -1)) {
-            cursor = cursor.getNextNode(char)!; //gexNextNode is assured to return Node, not-null
+    addNode(fullstr: string, material?: NodeMaterial) {
+        let newNode = new Node();
+        let cursor: Node = this;
+        for (const key of fullstr.slice(1, -1)) {
+            cursor = cursor.getChildOfKey(key);
         }
-        cursor.addChild(newNode);
+        cursor.addChild(fullstr.slice(-1), newNode);
         if (material) newNode.addMaterial(material, true);
-        
-
-        //newNode.addMaterial (after parent route set)
     }
 
-    getNextNode(char: string): Node | null {
-        if (char.length !== 1) return null;
-        return this.children.find(c => c.nodeChar == char) ?? this.getNewPlaceholderChild(char);
-    }
-
-    getNewPlaceholderChild(char: string): Node {
-        return new Node(char, this);
+    getChildOfKey(key: string): Node {
+        let child = this.children.get(key);
+        if (!child) {
+            child = new Node(null, this);
+            this.children.set(key, child);
+        }        
+        return child;
     }
 
     addMaterial(material: NodeMaterial, updateAncestorMetadata: boolean) {
         this.materials.push(material);
+        material.updateNode(this);
 
         if (updateAncestorMetadata && this.parent)
             this.parent.updateParentMetadataUptoRoot(material);
@@ -97,7 +85,7 @@ export class Node {
 
     updateParentMetadataUptoRoot(material: NodeMaterial) {
         var cursor: typeof this.parent = this;
-        while (cursor?.metadata.updatePromisingMaterials([material])) {
+        while (cursor?.metadata.updatePromisingMaterial(material)) {
             cursor = cursor.parent;
         }
     }
@@ -108,30 +96,20 @@ export class NodeMetaData {
 
     promisingMaterials: NodeMaterial[];
 
-    constructor(promisingMaterials: NodeMaterial[] = []) {
+    constructor() {
         this.promisingMaterials = [];
-        this.updatePromisingMaterials(promisingMaterials);
     }
 
     /**
      * Update promisingMaterials by two step, sorting and cutting off.
-     * @param materials new materials to be updated
+     * @param material new materials to be updated
      * @returns true if updated, false if not updated
      */
-    updatePromisingMaterials(materials: NodeMaterial[]): boolean {
-        if (this.promisingMaterials.length >= NodeMetaData.cutoff) {
-            const leastImportantOrigin = this.promisingMaterials.reduce((least, current) => {
-                return this.calculateImportance(least) <= this.calculateImportance(current) ? least : current;
-            });
-            const mostImportantNew = materials.reduce((biggest, current) => {
-                return this.calculateImportance(biggest) >= this.calculateImportance(current) ? biggest : current;
-            })
-            if (this.calculateImportance(leastImportantOrigin) > this.calculateImportance(mostImportantNew)) return false;    
-        }
+    updatePromisingMaterial(material: NodeMaterial): boolean {
+        const index = this.promisingMaterials.findIndex(m => this.calculateImportance(m) < this.calculateImportance(material));
+        if (index == -1) return false;
 
-        this.promisingMaterials = [...this.promisingMaterials, ...materials]
-            .sort((a, b) => this.calculateImportance(b) - this.calculateImportance(a)) //descending order
-            .slice(0, NodeMetaData.cutoff);
+        this.promisingMaterials = [...this.promisingMaterials.slice(0, index), material, ...this.promisingMaterials.slice(index, -1)];
         return true;
     }
 
@@ -147,11 +125,22 @@ export class NodeMetaData {
 
 export class NodeMaterial {
     content: string;
+    node: Node | null;
 
     useCount: number;
 
-    constructor(content: string) {
+    constructor(content: string, node: Node | null = null) {
         this.content = content;
+        this.node = node;
         this.useCount = 0;
+    }
+
+    updateNode(node: Node) {
+        this.node = node;
+    }
+
+    updateUsage() {
+        this.useCount++;
+        this.node?.metadata.updatePromisingMaterial(this);
     }
 }
