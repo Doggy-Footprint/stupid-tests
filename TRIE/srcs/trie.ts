@@ -106,10 +106,18 @@ export class NodeMetaData {
      * @returns true if updated, false if not updated
      */
     updatePromisingMaterial(material: NodeMaterial): boolean {
-        const index = this.promisingMaterials.findIndex(m => this.calculateImportance(m) < this.calculateImportance(material));
-        if (index == -1) return false;
+        if (this.promisingMaterials.some(m => m.isEqaul(material))) return true;
+        
+        const index = this.promisingMaterials.findIndex(m => this.calculateImportance(m) <= this.calculateImportance(material));
 
-        this.promisingMaterials = [...this.promisingMaterials.slice(0, index), material, ...this.promisingMaterials.slice(index, -1)];
+        if (this.promisingMaterials.length == 0) {
+            this.promisingMaterials.push(material);
+            return true;
+        } else if (index == -1) return false;
+
+        this.promisingMaterials 
+            = [...this.promisingMaterials.slice(0, index), material, ...this.promisingMaterials.slice(index)]
+                .slice(0, NodeMetaData.cutoff);
         return true;
     }
 
@@ -138,9 +146,18 @@ export class NodeMaterial {
     updateNode(node: Node) {
         this.node = node;
     }
+    
+    readContent() {
+        this.updateUsage();
+        return this.content;
+    }
 
     updateUsage() {
         this.useCount++;
-        this.node?.metadata.updatePromisingMaterial(this);
+        this.node?.updateParentMetadataUptoRoot(this);
+    }
+
+    isEqaul(material: NodeMaterial): boolean {
+        return this.content == material.content;
     }
 }
