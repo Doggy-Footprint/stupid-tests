@@ -22,25 +22,41 @@ To achieve `O(log (m+n))`, half of remaining elements need to be trimed for each
 
 ## Strategy 1 - wrong
 
-**half each arrays**
+half each arrays
 
 position of median is changed upon steps. - can't track median
 
-## Strategy 2 - developing
+## Strategy 2 - correct
 
-**remove the quarter of remaining elements from both side: `(m+n)/4`**
+remove the quarter of remaining elements from both side: `(m+n)/4`
 
-### SubStrategy 1
+### Substrategy 1 - wrong
 
-**find aheading array and following array and remove first `(m+n)/4` in aheading array and remove trailing `(m+n)/4` in following array**
+find aheading array and following array and remove first `(m+n)/4` in aheading array and remove trailing `(m+n)/4` in following array
 
-#### edge cases 
+### Substrategy 2 - correct
 
-**one array is three or more times bigger than the other**: trim the big one on both side
-**`[2, 3], [1, 4, 5, 6]` edge case**: `3` is median but *trimmed*
-**one array is entirely overlapped by the other**
+Check both arrays (m+n)/4 partitions. That is, check the biggest elements of each array's front `(m+n)/4` partition. The partition with smaller biggest element will be removed.
+Same logic allied to the back `(m+n)/4` partition.
 
-### SubStrategy 2
+#### key idea
 
-**find mathematically guarnteed not-median elements and trim it**
-**Ground rule is it should be trimed `(m+n)/4` on both side, not the same size on each array**
+remove half of elements while reserving median as median
+
+### Core Cases (including edge cases)
+
+#### Case 1
+
+A array becomes empty while loop.
+
+#### Case 2
+
+Arrays are ordered (i.e. end of one array is smaller than the start of the other)
+
+#### Case 3
+
+A array is 3+ times bigger than the other. In this case, the larger one's both side can be partitioned reserving median
+
+#### Case 4
+
+A array is exactly 3 times bigger than the other. In this case, we can't be sure if median is reserved if we remove both side of the larger one.
