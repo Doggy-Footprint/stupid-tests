@@ -33,14 +33,14 @@ export class Trie {
 export class Node {
     children: Map<string, Node>; // not-null // TODO: make children a Set object.
     parent: Node | null;
-    metadata: NodeMetaData; // not-null
+    metadata: NodeMetadata; // not-null
     materials: NodeMaterial[];
 
     constructor(materials?: NodeMaterial[] | null, parent: Node | null = null) {
         this.parent = parent;
         this.children = new Map<string, Node>();
         // additional information such as metadata and materials set via other methods.
-        this.metadata = new NodeMetaData();
+        this.metadata = new NodeMetadata();
         this.materials = materials ?? [];
     }
 
@@ -77,12 +77,14 @@ export class Node {
 
     addMaterial(material: NodeMaterial, updateAncestorMetadata: boolean) {
         this.materials.push(material);
-        material.updateNode(this);
+        material.moveNode(this);
 
         if (updateAncestorMetadata && this.parent)
+            //TODO update parameter to [material]
             this.parent.updateParentMetadataUptoRoot(material);
     }
 
+    // TODO: get NodeMaterial[]
     updateParentMetadataUptoRoot(material: NodeMaterial) {
         var cursor: typeof this.parent = this;
         while (cursor?.metadata.updatePromisingMaterial(material)) {
@@ -91,7 +93,7 @@ export class Node {
     }
 }
 
-export class NodeMetaData {
+export class NodeMetadata {
     private static readonly cutoff = 5;
 
     promisingMaterials: NodeMaterial[];
@@ -100,24 +102,22 @@ export class NodeMetaData {
         this.promisingMaterials = [];
     }
 
-    /**
-     * Update promisingMaterials by two step, sorting and cutting off.
-     * @param material new materials to be updated
-     * @returns true if updated, false if not updated
-     */
     updatePromisingMaterial(material: NodeMaterial): boolean {
+        
         if (this.promisingMaterials.some(m => m.isEqaul(material))) return true;
         
-        const index = this.promisingMaterials.findIndex(m => this.calculateImportance(m) <= this.calculateImportance(material));
-
         if (this.promisingMaterials.length == 0) {
             this.promisingMaterials.push(material);
             return true;
-        } else if (index == -1) return false;
+        }
+
+        const index = this.promisingMaterials.findIndex(m => this.calculateImportance(m) <= this.calculateImportance(material));
+
+        if (index == -1) return false;
 
         this.promisingMaterials 
             = [...this.promisingMaterials.slice(0, index), material, ...this.promisingMaterials.slice(index)]
-                .slice(0, NodeMetaData.cutoff);
+                .slice(0, NodeMetadata.cutoff);
         return true;
     }
 
@@ -143,7 +143,15 @@ export class NodeMaterial {
         this.useCount = 0;
     }
 
-    updateNode(node: Node) {
+    moveNode(node: Node) {
+        if (this.node) {
+            const index = node.materials.findIndex(m => m.isEqaul(this));
+            if (index >= 0) {
+                node.materials.splice(index, 1);
+            //node.metadata.updatePromisingMaterial(node.materials); TODO - after change updatePromisingMaterial
+            }
+        }
+
         this.node = node;
     }
     
@@ -154,6 +162,7 @@ export class NodeMaterial {
 
     updateUsage() {
         this.useCount++;
+        // TODO update to use [this]
         this.node?.updateParentMetadataUptoRoot(this);
     }
 
