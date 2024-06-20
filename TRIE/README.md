@@ -1,38 +1,16 @@
-# Goal
+# Design of TRIE
 
-Practicing writing TRIE data structure with below needs.
-It might be different from typical TRIE.
+## TRIE class
+A TRIE object is reponsible for holding root nodes and managing string based simple TRIE data structure. To clarify, it shouldn't be influenced by Node's Metadata or Materials.
 
-## Functionalities needed
+## Node class
+A Node object is responsible for forming TRIE with its own character. Additionally, the Node class holds NodeMetadata, NodeMaterial properties. Node class's responsibility is to call each properties method, not manipulating them directly.
 
-### Tree
+## NodeMetadata
+A NodeMetadata object represents a Node object's descendants information, which can be used to search TRIE with addtitional purpose such as show frequently used first.
 
-#### properties
-```ts
-roots: Node[]
-```
+## NodeMaterial
+A NodeMaterial object is what is connected to the string formed by TRIE route. Since multiple NodeMaterial objects can be connected to a single string, a Node class has multiple NodeMaterial objects.
 
-#### methods
-
-1. find a `Node` object with string
-2. from given partial string, give hints to possible nodes
-    For example, cumulative number of descendants, frequently accessed descendant(history), 
-3. add new node
-    this needs search in parent's all descendant for better connectivity.
-4. delete existing node
-    children of deleted node needs new parent
-
-### Node
-
-#### properties
-
-```ts
-substr: string
-children: Node[]
-parent: Node | null(only roots)
-metadata: MetadataAboutDescendant
-```
-
-#### methods
-
-- [ ] figure out add / delete - affecting nodes 
+## Thoughts
+NodeMetadata and NodeMaterial classes are closely connected. For example, NodeMetadata need to query NodeMaterial object's `count` property to calculate importance of the NodeMaterial object.

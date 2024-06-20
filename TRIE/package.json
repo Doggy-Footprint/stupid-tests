@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "main": "tsc index.ts && node index.js"
+    "test": "tsc -p tsconfig.json && node dist/index.js"
   },
   "author": "Doggy-Footprint",
   "license": "GPL-3.0-or-later",
