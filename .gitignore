@@ -6,3 +6,4 @@ type in native/app
 **/package-lock.json
 test_dependency_in_subclass/index.js
 TRIE/*.js
+**/*/.idea
