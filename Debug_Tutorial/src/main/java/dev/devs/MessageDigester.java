@@ -13,7 +13,14 @@ public class MessageDigester {
     }
 
     public void update(String input) {
+        boolean updated = false;
+        this.updateInternal(input);
+        updated = true;
+    }
+
+    private void updateInternal(String input) {
         this.mdInstance.update(input.getBytes());
+        this.digestDone = false;
     }
 
     public String digest() {

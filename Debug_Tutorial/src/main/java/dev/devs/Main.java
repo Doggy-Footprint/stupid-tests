@@ -9,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
+        Sum<Double> sumDub_z = new Sum<>();
         Sum<Double> sumDub_A = new Sum<>();
         Sum<Double> sumDub_B = new Sum<>();
         Sum<Float> sumFloat = new Sum<>();
@@ -48,6 +49,9 @@ public class Main {
             md = new MessageDigester("MD5");
             md.update("Hello World");
             String digest = md.digest();
+            System.out.println(digest);
+            md.update("No!!");
+            digest = md.digest();
             System.out.println(digest);
         } catch (NoSuchAlgorithmException e) {
             System.out.println("failed to find message digest algorithm instance");
