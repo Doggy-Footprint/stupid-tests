@@ -1,6 +1,6 @@
-package dev.devs.practice;
+package dev.devs.synchronization;
 
-public class SyncSample {
+public class SyncSampleUnary {
     private int c = 0;
 
     public synchronized void increment() {

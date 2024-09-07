@@ -1,11 +1,9 @@
-package dev.devs;
-
-import dev.devs.practice.SyncSample;
+package dev.devs.synchronization;
 
 /**
  * Been a while and funny mistake.
  *
- * result:
+ * result of SyncSampleUnary
  * Test thread safety
  * shared - increment started
  * shared - decrement started
@@ -28,20 +26,17 @@ public class SyncTest {
 
     public static final int REPEAT = 100000;
 
-    public SyncSample a = new SyncSample();
-    public SyncSample b = new SyncSample();
-    public SyncSample shared = new SyncSample();
-
-
     public static void main(String[] args) {
         SyncTest st = new SyncTest();
 
-        st.testShared();
+        st.testSharedUnary();
         System.out.println("-----");
-        st.testAB();
+        st.testABUnary();
     }
 
-    public void testShared() {
+    public void testSharedUnary() {
+        SyncSampleUnary shared = new SyncSampleUnary();
+
         System.out.println("Test thread safety");
 
         Runnable r1 = new Runnable() {
@@ -90,7 +85,9 @@ public class SyncTest {
         System.out.println("shared done");
     }
 
-    public void testAB() {
+    public void testABUnary() {
+        SyncSampleUnary a = new SyncSampleUnary();
+        SyncSampleUnary b = new SyncSampleUnary();
         System.out.println("Test A, B");
 
         Runnable r1 = new Runnable() {
@@ -137,5 +134,11 @@ public class SyncTest {
         }
 
         System.out.println("AB done");
+    }
+
+    public void testSharedLoop() {
+        SyncSampleLoop shared = new SyncSampleLoop();
+        // 테스트 목표
+        // object 하나에서 다른 synced method도 블락되는지, 다른 객체면 잘 돌아가는지.
     }
 }
