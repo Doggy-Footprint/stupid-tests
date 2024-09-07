@@ -7,3 +7,4 @@ type in native/app
 test_dependency_in_subclass/index.js
 TRIE/*.js
 **/*/.idea
+**/.vscode
