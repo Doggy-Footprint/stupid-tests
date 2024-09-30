@@ -33,6 +33,7 @@ class Cell:
     distance: int
     location: int=field(compare=False)
 
+# TODO: greedy approach is much slower. check if it's an implementation issue
 def calculate_distance_greedy(source: str, target: str, inspect: bool = False) -> int:
     matrix_size = len(target) * len(source)
     row_size = len(target)
