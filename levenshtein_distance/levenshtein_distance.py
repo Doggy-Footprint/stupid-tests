@@ -34,17 +34,19 @@ class Cell:
     location: int=field(compare=False)
 
 def calculate_distance_greedy(source: str, target: str, inspect: bool = False) -> int:
-    visited = set()
-    cell_queue = queue()
-    def add_cell(distance: int, location: int):
-        if location in visited:
-            return
-        cell_queue.put(Cell(distance, location))
-        visited.add(location)
-
     matrix_size = len(target) * len(source)
     row_size = len(target)
     max_row = len(source)
+
+    matrix = [None] * matrix_size
+    cell_queue = queue()
+    def add_cell(distance: int, location: int):
+
+        if matrix[location] and matrix[location] <= distance:
+            return
+
+        cell_queue.put(Cell(distance, location))
+        matrix[location] = distance
 
     cost_a = 0 if source[0] == target[1] else SUBSTITUTION # 0, 1
     cost_b = 0 if source[1] == target[0] else SUBSTITUTION # 1, 0
@@ -65,36 +67,39 @@ def calculate_distance_greedy(source: str, target: str, inspect: bool = False) -
         col = cell.location % row_size
         # cost = 0 if source[row] == target[col] else SUBSTITUTION
 
-        if cell.location == matrix_size - 2:
-            return cell.distance + INSERTION
-        if cell.location == matrix_size - row_size - 1:
-            return cell.distance + DELETION
-        if cell.location == matrix_size - row_size - 2:
-            cost = 0 if source[row + 1] == target[col + 1] else SUBSTITUTION
-            return cell.distance + cost
-        
+        # if cell.location == matrix_size - 2:
+        #     return cell.distance + INSERTION
+        # if cell.location == matrix_size - row_size - 1:
+        #     return cell.distance + DELETION
+        # if cell.location == matrix_size - row_size - 2:
+        #     cost = 0 if source[row + 1] == target[col + 1] else SUBSTITUTION
+        #     return cell.distance + cost
+
         if inspect:
             print(f'{row + 1}, {col + 1} \t {cell.distance}')
+
+        if cell.location == matrix_size - 1:
+            return cell.distance
 
         if row == max_row - 1:
             add_cell(cell.distance + INSERTION, cell.location + 1)
         elif col == row_size - 1:
             add_cell(cell.distance + DELETION, cell.location + row_size)
         else:
-            cost = 0 if source[row + 1] == target[col + 1] else SUBSTITUTION
+            cost_r = 0 if source[row] == target[col + 1] else SUBSTITUTION
+            cost_b = 0 if source[row + 1] == target[col] else SUBSTITUTION
+            cost_d = 0 if source[row + 1] == target[col + 1] else SUBSTITUTION
 
-            right = min(cell.distance + INSERTION, INSERTION * (col + 1) + DELETION, INSERTION * col + cost) if row == 0 else cell.distance + INSERTION
-            below = min(cell.distance + DELETION, DELETION * (row + 1) + INSERTION, DELETION * row + cost) if col == 0 else cell.distance + DELETION
+            right = min(cell.distance + INSERTION, INSERTION * (col + 2) + DELETION, INSERTION * (col + 1) + cost_r) if row == 0 else cell.distance + INSERTION
+            below = min(cell.distance + DELETION, DELETION * (row + 2) + INSERTION, DELETION * (row + 1) + cost_b) if col == 0 else cell.distance + DELETION
 
             add_cell(right, cell.location + 1) # right
             add_cell(below, cell.location + row_size) # below
-            add_cell(cell.distance + cost, cell.location + row_size + 1) # diag
-    # TODO: consider emitted initialization rows and columns to calculate
-        
+            add_cell(cell.distance + cost_d, cell.location + row_size + 1) # diag        
 
 if __name__=='__main__':
     check_triangle_validity()
-    if 0: 
+    if 1: 
         # testing for 10 * 1000 samples
         dictionary = []
         samples = []
@@ -132,8 +137,9 @@ if __name__=='__main__':
                 result_str += '\t'
             result_str += str(cell)
         print(result_str)
-    if 1:
+    if 0:
         # testing for error case - greedy
         src = 'coexpire'
-        tar = 'evictee'
-        calculate_distance_greedy(src, tar, True)
+        tar = 'opalesce'
+        res = calculate_distance_greedy(src, tar, True)
+        print(res)
